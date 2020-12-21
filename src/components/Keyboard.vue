@@ -64,6 +64,7 @@ export default {
   },
   methods: {
     play() {
+      this.playing = true
       this.selectedPitches.forEach(pitch => {
         pitch.oscillator = this.audioContext.createOscillator()
         pitch.oscillator.frequency.value = pitch.frequency
@@ -71,7 +72,6 @@ export default {
         pitch.oscillator.connect(this.masterGainNode)
         pitch.oscillator.start()
       })
-      this.playing = true
     },
     stop() {
       if (this.playing) {
@@ -101,6 +101,12 @@ export default {
     }
     window.addEventListener('mouseup', this.stop)
   },
+  mounted() {
+    let keyboard = document.querySelector(".keyboard")
+    let inner = keyboard.scrollWidth
+    let outer = keyboard.offsetWidth
+    keyboard.scrollLeft = (inner - outer) / 2
+  }
 }
 </script>
 
