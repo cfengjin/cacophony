@@ -1,5 +1,5 @@
 <template>
-  <Chart :pitches="selectedPitches" :key="selectedPitches.length ? selectedPitches[0] : 0" />
+  <Chart :pitches="selectedPitches" />
 
   <div class="keyboard">
     <div
