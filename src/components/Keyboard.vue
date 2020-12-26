@@ -11,28 +11,37 @@
     />
   </div>
 
-  <button @mousedown="play">Play</button>
-  <button @click="clear">Clear</button>
+  <div class="controls">
+    <div class="left">
+      <label for="waveform">Waveform:</label>
+      <label for="sine">
+        <input type="radio" id="sine" name="waveform" value="sine" v-model="waveform">
+        Sine
+      </label>
+      <label for="square">
+        <input type="radio" id="square" name="waveform" value="square" v-model="waveform">
+        Square
+      </label>
+      <label for="triangle">
+        <input type="radio" id="triangle" name="waveform" value="triangle" v-model="waveform">
+        Triangle
+      </label>
+      <label for="sawtooth">
+        <input type="radio" id="sawtooth" name="waveform" value="sawtooth" v-model="waveform">
+        Sawtooth
+      </label>
+    </div>
 
-  <br />
-  <label for="volume">Volume:</label>
-  <br />
-  <input type="range" id="volume" name="volume" min="0" max="1" step="0.01" v-model="volume">
+    <div class="center">
+      <label for="volume">Volume:</label>
+      <input type="range" id="volume" name="volume" min="0" max="1" step="0.01" v-model="volume">
+    </div>
 
-  <p>Select a waveform:</p>
-
-  <input type="radio" id="sine" name="waveform" value="sine" v-model="waveform">
-  <label for="sine">Sine</label>
-  <br />
-  <input type="radio" id="square" name="waveform" value="square" v-model="waveform">
-  <label for="square">Square</label>
-  <br />
-  <input type="radio" id="triangle" name="waveform" value="triangle" v-model="waveform">
-  <label for="triangle">Triangle</label>
-  <br />
-  <input type="radio" id="sawtooth" name="waveform" value="sawtooth" v-model="waveform">
-  <label for="sawtooth">Sawtooth</label>
-
+    <div class="right">
+      <button @click="clear">Clear</button>
+      <button @mousedown="play">Play</button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -115,6 +124,9 @@ export default {
   display: flex;
   flex-direction: row;
   overflow: auto;
+  height: 182px;
+  min-height: 182px;
+  margin-bottom: 24px;
 }
 .key {
   margin: 0 2px;
@@ -135,5 +147,23 @@ export default {
 .selected {
   background-color: deepskyblue;
   border-color: deepskyblue;
+}
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.controls .left, .center, .right {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0 24px;
+}
+.controls button {
+  width: 5rem;
+  height: 3rem;
 }
 </style>

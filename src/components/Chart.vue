@@ -16,21 +16,21 @@ export default {
   data() {
     return {
       chart: {
-        height: 400,
-        width: window.innerWidth,
-      }
+        height: 0,
+        width: 0,
+      },
+      period: 1 / 27.5
     }
   },
   computed: {
     data() {
-      let delta = .001;
+      let delta = .0001;
 
       return this.pitches.map(pitch => {
         let points = [];
 
         for (let i = 0; i < 1/delta; ++i) {
-          let period = 1 / this.pitches[0].frequency
-          let t = delta * i * 4 * period
+          let t = delta * i * this.period
           points.push({
             time: t,
             displacement: this.d(pitch.frequency, t)
@@ -46,13 +46,13 @@ export default {
     },
     x() {
       return d3.scaleLinear()
-        .domain([0, 4 / this.pitches[0].frequency])
-        .range([100, this.chart.width - 100])
+        .domain([0, this.period])
+        .range([48, this.chart.width])
     },
     y() {
       return d3.scaleLinear()
         .domain([-1, 1])
-        .range([50, this.chart.height - 50])
+        .range([this.chart.height - 24, 24])
     },
     line() {
       return d3.line()
@@ -66,39 +66,36 @@ export default {
       return Math.sin(omega * t)
     },
     renderChart() {
-      this.chart.width = window.innerWidth
+      this.chart.width = document.querySelector(".container").clientWidth
+      this.chart.height = document.querySelector(".container").clientHeight
 
-      if (this.pitches.length) {
-        d3.select(".chart")
-          .attr("display", "block")
-          .attr("viewBox", [0, 0, this.chart.width, this.chart.height])
+      d3.select(".chart")
+        .attr("display", "block")
+        .attr("viewBox", [0, 0, this.chart.width, this.chart.height])
 
-        d3.select(".bottom-axis")
-          .attr("transform", `translate(0, ${this.chart.height / 2})`)
-          .call(d3.axisBottom(this.x))
-        d3.select(".left-axis")
-          .attr("transform", `translate(100, 0)`)
-          .call(d3.axisLeft(this.y))
-        
-        d3.select(".lines")
-          .attr("fill", "none")
-          .attr("stroke", "black")
-          .attr("stroke-width", 2)
-          .attr("stroke-linejoin", "round")
-          .attr("stroke-linecap", "round")
-          .selectAll("path")
-          .data(this.data)
-          .join("path")
-          .attr("d", d => this.line(d.points));
-      } else {
-        d3.select(".chart")
-          .attr("display", "none")
-      }
+      d3.select(".bottom-axis")
+        .attr("transform", `translate(0, ${this.chart.height / 2})`)
+        .call(d3.axisBottom(this.x))
+      d3.select(".left-axis")
+        .attr("transform", `translate(48, 0)`)
+        .call(d3.axisLeft(this.y))
+
+      d3.select(".lines")
+        .attr("display", "initial")
+        .attr("fill", "none")
+        .attr("stroke", "black")
+        .attr("stroke-width", 2)
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .selectAll("path")
+        .data(this.data)
+        .join("path")
+        .attr("d", d => this.line(d.points));
     }
   },
   mounted() {
-    window.addEventListener('resize', this.renderChart);
     this.renderChart()
+    window.addEventListener('resize', this.renderChart);
   },
   beforeUpdate() {
     this.renderChart()
@@ -108,6 +105,7 @@ export default {
 
 <style>
 .container {
-  height: 400px;
+  overflow: hidden;
+  flex-grow: 1;
 }
 </style>
