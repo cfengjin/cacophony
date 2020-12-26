@@ -39,7 +39,7 @@
 
     <div class="right">
       <button @click="clear">Clear</button>
-      <button @mousedown="play">Play</button>
+      <button @mousedown="play" @touchstart="play">Play</button>
     </div>
   </div>
 </template>
@@ -109,6 +109,7 @@ export default {
       baseFreq *= 2 ** (1/12)
     }
     window.addEventListener('mouseup', this.stop)
+    window.addEventListener('touchend', this.stop)
   },
   mounted() {
     let keyboard = document.querySelector(".keyboard")
