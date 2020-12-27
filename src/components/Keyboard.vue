@@ -39,7 +39,7 @@
 
     <div class="right">
       <button @click="clear">Clear</button>
-      <button @mousedown="play" @touchstart="play">Play</button>
+      <button @mousedown="play" @touchstart.prevent="play">Play</button>
     </div>
   </div>
 </template>
