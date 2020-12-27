@@ -4,7 +4,8 @@
   <div class="keyboard">
     <div
       class="key"
-      :class="{ black: pitch.class[pitch.class.length - 1] === '#', selected: pitch.selected }"
+      :class="{ black: isBlack(pitch) }"
+      :style="{ backgroundColor: keyColor(pitch)}"
       v-for="pitch in pitches"
       :key="pitch.frequency"
       @click="pitch.selected = !pitch.selected"
@@ -38,7 +39,7 @@
     </div>
 
     <div class="right">
-      <button @click="clear">Clear</button>
+      <button @click.prevent="clear">Clear</button>
       <button @mousedown="play" @touchstart.prevent="play">Play</button>
     </div>
   </div>
@@ -46,6 +47,7 @@
 
 <script>
 import Chart from './Chart.vue'
+import * as d3 from "d3"
 
 export default {
   components: {
@@ -64,6 +66,11 @@ export default {
   computed: {
     selectedPitches() {
       return this.pitches.filter(pitch => pitch.selected)
+    },
+    color() {
+      return d3.scaleOrdinal()
+        .domain(['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'])
+        .range(['#4e79a7', '#f28e2c', '#e15759', '#76b7b2', '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab', '#888888', 'whitesmoke'])
     }
   },
   watch: {
@@ -90,6 +97,12 @@ export default {
     },
     clear() {
       this.selectedPitches.forEach(pitch => pitch.selected = false)
+    },
+    isBlack(pitch) {
+      return pitch.class[pitch.class.length - 1] === '#'
+    },
+    keyColor(pitch) {
+      return pitch.selected ? this.color(pitch.class) : this.isBlack(pitch) ? '#1f1f1f' : 'white'
     }
   },
   created() {

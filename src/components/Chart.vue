@@ -58,6 +58,11 @@ export default {
       return d3.line()
         .x(d => this.x(d.time))
         .y(d => this.y(d.displacement))
+    },
+    color() {
+      return d3.scaleOrdinal()
+        .domain(['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'])
+        .range(['#4e79a7', '#f28e2c', '#e15759', '#76b7b2', '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab', '#888888', 'whitesmoke'])
     }
   },
   methods: {
@@ -75,22 +80,26 @@ export default {
 
       d3.select(".bottom-axis")
         .attr("transform", `translate(0, ${this.chart.height / 2})`)
+        .attr("stroke", "whitesmoke")
         .call(d3.axisBottom(this.x))
       d3.select(".left-axis")
         .attr("transform", `translate(48, 0)`)
+        .attr("stroke", "whitesmoke")
         .call(d3.axisLeft(this.y))
+      d3.selectAll(".domain")
+        .attr("stroke", "whitesmoke")
 
       d3.select(".lines")
         .attr("display", "initial")
         .attr("fill", "none")
-        .attr("stroke", "black")
-        .attr("stroke-width", 2)
+        .attr("stroke-width", 1.5)
         .attr("stroke-linejoin", "round")
         .attr("stroke-linecap", "round")
         .selectAll("path")
         .data(this.data)
         .join("path")
-        .attr("d", d => this.line(d.points));
+        .attr("d", d => this.line(d.points))
+        .attr("stroke", d => this.color(d.class))
     }
   },
   mounted() {
@@ -107,5 +116,6 @@ export default {
 .container {
   overflow: hidden;
   flex-grow: 1;
+  background-color: #1f1f1f;
 }
 </style>
