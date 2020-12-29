@@ -1,5 +1,5 @@
 <template>
-  <Chart :pitches="selectedPitches" />
+  <Chart :pitches="selectedPitches" :showFundamentals="showFundamentals" :showInterference="showInterference"/>
 
   <div class="keyboard">
     <div
@@ -13,32 +13,44 @@
   </div>
 
   <div class="controls">
-    <div class="left">
-      <label for="waveform">Waveform:</label>
+    <div>
+      Display:
+      <label for="fundamentals">
+        <input type="checkbox" id="fundamentals" v-model="showFundamentals">
+        Fundamentals
+      </label>
+      <label for="interference">
+        <input type="checkbox" id="interference" v-model="showInterference">
+        Interference
+      </label>
+    </div>
+
+    <div>
+      Waveform:
       <label for="sine">
-        <input type="radio" id="sine" name="waveform" value="sine" v-model="waveform">
+        <input type="radio" id="sine" value="sine" v-model="waveform">
         Sine
       </label>
       <label for="square">
-        <input type="radio" id="square" name="waveform" value="square" v-model="waveform">
+        <input type="radio" id="square" value="square" v-model="waveform">
         Square
       </label>
       <label for="triangle">
-        <input type="radio" id="triangle" name="waveform" value="triangle" v-model="waveform">
+        <input type="radio" id="triangle" value="triangle" v-model="waveform">
         Triangle
       </label>
       <label for="sawtooth">
-        <input type="radio" id="sawtooth" name="waveform" value="sawtooth" v-model="waveform">
+        <input type="radio" id="sawtooth" value="sawtooth" v-model="waveform">
         Sawtooth
       </label>
     </div>
 
-    <div class="center">
+    <div>
       <label for="volume">Volume:</label>
       <input type="range" id="volume" name="volume" min="0" max="1" step="0.01" v-model="volume">
     </div>
 
-    <div class="right">
+    <div>
       <button @click.prevent="clear">Clear</button>
       <button @mousedown="play" @touchstart.prevent="play">Play</button>
     </div>
@@ -60,7 +72,9 @@ export default {
       volume: 0.1,
       pitches: [],
       waveform: 'sine',
-      playing: false
+      playing: false,
+      showFundamentals: true,
+      showInterference: false,
     }
   },
   computed: {
@@ -169,7 +183,7 @@ export default {
   flex-wrap: wrap;
   margin-bottom: 24px;
 }
-.controls .left, .center, .right {
+.controls div {
   display: flex;
   justify-content: space-evenly;
   align-items: center;

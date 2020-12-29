@@ -12,7 +12,7 @@
 import * as d3 from "d3"
 
 export default {
-  props: ['pitches'],
+  props: ['pitches', 'showFundamentals', 'showInterference'],
   data() {
     return {
       chart: {
@@ -26,12 +26,11 @@ export default {
     data() {
       let delta = .0001;
 
-      return this.pitches.map(pitch => {
-        let points = [];
-
+      let fundamentals = this.pitches.map(pitch => {
+        let pts = [];
         for (let i = 0; i < 1/delta; ++i) {
           let t = delta * i * this.period
-          points.push({
+          pts.push({
             time: t,
             displacement: this.d(pitch.frequency, t)
           })
@@ -40,9 +39,35 @@ export default {
         return {
           class: pitch.class,
           frequency: pitch.frequency,
-          points: points
+          points: pts
         }
       })
+
+      if (fundamentals.length > 1 && this.showInterference) {
+        let pts = [];
+        for (let i = 0; i < 1/delta; ++i) {
+          let t = delta * i * this.period
+          pts.push({
+            time: t,
+            displacement: fundamentals.reduce((acc, obj) => acc + obj.points[i].displacement, 0),
+          })
+        }
+
+        let interference = {
+          class: "Chord",
+          points: pts
+        }
+
+        if (this.showFundamentals) {
+          return fundamentals.concat(interference)
+        }
+        return [interference]
+      }
+
+      if (this.showFundamentals) {
+        return fundamentals
+      }
+      return []
     },
     x() {
       return d3.scaleLinear()
@@ -51,7 +76,7 @@ export default {
     },
     y() {
       return d3.scaleLinear()
-        .domain([-1, 1])
+        .domain([this.showInterference ? -this.pitches.length : -1, this.showInterference ? this.pitches.length : 1])
         .range([this.chart.height - 24, 24])
     },
     line() {
@@ -61,8 +86,8 @@ export default {
     },
     color() {
       return d3.scaleOrdinal()
-        .domain(['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'])
-        .range(['#4e79a7', '#f28e2c', '#e15759', '#76b7b2', '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab', '#888888', 'whitesmoke'])
+        .domain(['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'Chord'])
+        .range(['#4e79a7', '#f28e2c', '#e15759', '#76b7b2', '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab', '#888888', 'whitesmoke', '#ffffff'])
     }
   },
   methods: {
@@ -92,7 +117,6 @@ export default {
       d3.select(".lines")
         .attr("display", "initial")
         .attr("fill", "none")
-        .attr("stroke-width", 1.5)
         .attr("stroke-linejoin", "round")
         .attr("stroke-linecap", "round")
         .selectAll("path")
@@ -100,6 +124,7 @@ export default {
         .join("path")
         .attr("d", d => this.line(d.points))
         .attr("stroke", d => this.color(d.class))
+        .attr("stroke-width", d => d.class == "Chord" ? 3 : 1.5)
     }
   },
   mounted() {
