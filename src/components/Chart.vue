@@ -76,7 +76,7 @@ export default {
     },
     y() {
       return d3.scaleLinear()
-        .domain([this.showInterference ? -this.pitches.length : -1, this.showInterference ? this.pitches.length : 1])
+        .domain([this.showInterference ? -this.pitches.length : -1.25, this.showInterference ? this.pitches.length : 1.25])
         .range([this.chart.height - 24, 24])
     },
     line() {
