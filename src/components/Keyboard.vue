@@ -8,7 +8,7 @@
       :style="{ backgroundColor: keyColor(pitch)}"
       v-for="pitch in pitches"
       :key="pitch.frequency"
-      @click="pitch.selected = !pitch.selected"
+      @click="pitch.selected = !pitch.selected; stopSequence()"
     />
   </div>
 
@@ -51,8 +51,8 @@
     </div>
 
     <div>
-      <button @click.prevent="clear">Clear</button>
-      <button @mousedown="play" @touchstart.prevent="play">Play</button>
+      <button @click.prevent="clear(true)">Clear</button>
+      <button @mousedown="play(true)" @touchstart.prevent="play(true)">Play</button>
     </div>
   </div>
 
@@ -115,11 +115,14 @@ export default {
   },
   watch: {
     volume() {
-      this.masterGainNode.gain.value = this.volume
+      this.masterGainNode.gain.setValueAtTime(this.volume, this.audioContext.currentTime)
     }
   },
   methods: {
-    play() {
+    play(click) {
+      if (click) {
+        this.stopSequence()
+      }
       this.playing = true
       this.selectedPitches.forEach(pitch => {
         pitch.oscillator = this.audioContext.createOscillator()
@@ -135,8 +138,10 @@ export default {
         this.playing = false
       }
     },
-    clear() {
-      this.stop();
+    clear(click) {
+      if (click) {
+        this.stopSequence()
+      }
       this.selectedPitches.forEach(pitch => pitch.selected = false)
     },
     isBlack(pitch) {
@@ -151,35 +156,46 @@ export default {
       }
     },
     selectChord(index) {
-      this.clear();
+      this.clear(false);
       this.chords[index].forEach(pitch => pitch.selected = true);
     },
     playChord() {
       this.stop();
-      this.clear();
+      this.clear(false);
       this.chords[this.sequencePosition++].forEach(pitch => pitch.selected = true);
-      this.play();
-      if (this.sequencePosition == this.chords.length) {
-        this.sequencePosition = 0;
+      this.play(false);
+      if (this.sequencePosition >= this.chords.length) {
+        this.sequencePosition = 0
       }
     },
     startSequence() {
-      this.sequencePosition = 0;
-      this.playChord();
-      let self = this;
-      this.intervalID = setInterval(function() {
-        self.playChord();
-      }, 60000 / this.tempo);
+      this.sequencePosition = 0
+      if (this.chords.length > 0) {
+        this.playChord()
+        let self = this
+        this.intervalID = setInterval(function() {
+          self.playChord()
+        }, 60000 / this.tempo)
+      }
     },
     stopSequence() {
-      clearInterval(this.intervalID);
-      this.stop();
-      this.clear();
+      if (this.intervalID !== 0) {
+        clearInterval(this.intervalID);
+        this.intervalID = 0;
+        this.stop();
+      }
     },
     removeChord(index) {
+      if (this.chords.length === 1) {
+        this.stopSequence()
+      }
       this.chords.splice(index, 1);
+      if (this.sequencePosition >= this.chords.length) {
+        this.sequencePosition = 0
+      }
     },
     clearChords() {
+      this.stopSequence()
       this.chords = [];
     },
   },
