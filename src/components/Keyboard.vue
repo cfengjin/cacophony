@@ -47,12 +47,34 @@
 
     <div>
       <label for="volume">Volume:</label>
-      <input type="range" id="volume" name="volume" min="0" max="1" step="0.01" v-model="volume">
+      <input type="range" id="volume" min="0" max="1" step="0.01" v-model="volume">
     </div>
 
     <div>
       <button @click.prevent="clear">Clear</button>
       <button @mousedown="play" @touchstart.prevent="play">Play</button>
+    </div>
+  </div>
+
+  <div class="sequencer">
+    <button @click.prevent="clearChords">Clear Chords</button>
+    <div
+      class="chord"
+      @click.prevent="selectChord(index)"
+      v-for="(chord, index) in chords"
+      :key="chord"
+    >
+      <div v-for="pitch in chord.slice().reverse()" :key="pitch.frequency">
+        {{ pitch.class }}
+      </div>
+      <span @click.stop.prevent="removeChord(index)">&#10006;</span>
+    </div>
+    <button @click.prevent="addChord">Add Chord</button>
+    <button @click.prevent="startSequence">Start</button>
+    <button @click.prevent="stopSequence">Stop</button>
+    <div>
+      <label for="volume">Tempo:</label>
+      <input type="number" id="volume" min="40" max="208" step="1" v-model="tempo">
     </div>
   </div>
 </template>
@@ -75,6 +97,10 @@ export default {
       playing: false,
       showFundamentals: true,
       showInterference: false,
+      chords: [],
+      tempo: 76,
+      sequencePosition: 0,
+      intervalID: 0,
     }
   },
   computed: {
@@ -110,6 +136,7 @@ export default {
       }
     },
     clear() {
+      this.stop();
       this.selectedPitches.forEach(pitch => pitch.selected = false)
     },
     isBlack(pitch) {
@@ -117,7 +144,44 @@ export default {
     },
     keyColor(pitch) {
       return pitch.selected ? this.color(pitch.class) : this.isBlack(pitch) ? '#1f1f1f' : 'white'
-    }
+    },
+    addChord() {
+      if (this.selectedPitches.length > 0) {
+        this.chords.push(this.selectedPitches);
+      }
+    },
+    selectChord(index) {
+      this.clear();
+      this.chords[index].forEach(pitch => pitch.selected = true);
+    },
+    playChord() {
+      this.stop();
+      this.clear();
+      this.chords[this.sequencePosition++].forEach(pitch => pitch.selected = true);
+      this.play();
+      if (this.sequencePosition == this.chords.length) {
+        this.sequencePosition = 0;
+      }
+    },
+    startSequence() {
+      this.sequencePosition = 0;
+      this.playChord();
+      let self = this;
+      this.intervalID = setInterval(function() {
+        self.playChord();
+      }, 60000 / this.tempo);
+    },
+    stopSequence() {
+      clearInterval(this.intervalID);
+      this.stop();
+      this.clear();
+    },
+    removeChord(index) {
+      this.chords.splice(index, 1);
+    },
+    clearChords() {
+      this.chords = [];
+    },
   },
   created() {
     this.masterGainNode = this.audioContext.createGain()
@@ -194,4 +258,23 @@ export default {
   width: 5rem;
   height: 3rem;
 }
+
+.sequencer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.sequencer button {
+  width: 5rem;
+  height: 3rem;
+}
+
+.chord {
+  margin: 0 4px;
+  align-self: flex-end;
+}
+
 </style>
