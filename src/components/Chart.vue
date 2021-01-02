@@ -43,7 +43,7 @@ export default {
         }
       })
 
-      if (fundamentals.length > 1 && this.showInterference) {
+      if (fundamentals.length > 0 && this.showInterference) {
         let pts = [];
         for (let i = 0; i < 1/delta; ++i) {
           let t = delta * i * this.period
@@ -76,7 +76,10 @@ export default {
     },
     y() {
       return d3.scaleLinear()
-        .domain([this.showInterference ? -this.pitches.length : this.showFundamentals ? -1.25 : 0, this.showInterference ? this.pitches.length : this.showFundamentals ? 1.25 : 0])
+        .domain([
+          !this.showInterference && !this.showFundamentals ? 0 : !this.showInterference || this.pitches.length <= 1 ? -1.25 : -this.pitches.length,
+          !this.showInterference && !this.showFundamentals ? 0 : !this.showInterference || this.pitches.length <= 1 ? 1.25 : this.pitches.length
+        ])
         .range([this.chart.height - 24, 24])
     },
     line() {

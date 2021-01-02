@@ -116,6 +116,12 @@ export default {
   watch: {
     volume() {
       this.masterGainNode.gain.setValueAtTime(this.volume, this.audioContext.currentTime)
+    },
+    tempo() {
+      this.stopSequence()
+      if (this.intervalID !== 0) {
+        this.sequence()
+      }
     }
   },
   methods: {
@@ -123,6 +129,7 @@ export default {
       if (click) {
         this.stopSequence()
       }
+      console.log("hello")
       this.playing = true
       this.selectedPitches.forEach(pitch => {
         pitch.oscillator = this.audioContext.createOscillator()
@@ -169,7 +176,11 @@ export default {
       }
     },
     startSequence() {
+      this.stopSequence()
       this.sequencePosition = 0
+      this.sequence()
+    },
+    sequence() {
       if (this.chords.length > 0) {
         this.playChord()
         let self = this
@@ -182,7 +193,7 @@ export default {
       if (this.intervalID !== 0) {
         clearInterval(this.intervalID);
         this.intervalID = 0;
-        this.stop();
+        this.stop()
       }
     },
     removeChord(index) {
@@ -208,10 +219,10 @@ export default {
     let numPitches = 88
     for (let i = 0; i < numPitches; ++i) {
       this.pitches.push({
-        class: classes[i%12],
+        class: classes[i % 12],
         frequency: baseFreq,
         selected: false,
-        oscillator: {} 
+        oscillator: {},
       })
       baseFreq *= 2 ** (1/12)
     }
