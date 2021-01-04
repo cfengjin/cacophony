@@ -43,7 +43,7 @@ export default {
         }
       })
 
-      if (fundamentals.length > 0 && this.showInterference) {
+      if (fundamentals.length > 1 && this.showInterference) {
         let pts = [];
         for (let i = 0; i < 1/delta; ++i) {
           let t = delta * i * this.period
