@@ -72,9 +72,9 @@
     <button @click.prevent="addChord">Add Chord</button>
     <button @click.prevent="startSequence">Start</button>
     <button @click.prevent="stopSequence">Stop</button>
-    <div>
-      <label for="volume">Tempo:</label>
-      <input type="number" id="volume" min="40" max="208" step="1" v-model="tempo">
+    <div class="tempo-container">
+      <label for="tempo">Tempo:</label>
+      <input type="number" id="tempo" min="40" max="208" step="1" v-model="tempo">
     </div>
   </div>
 </template>
@@ -297,6 +297,10 @@ export default {
 .sequencer button {
   width: 5rem;
   height: 3rem;
+}
+
+.tempo-container {
+  margin: 0 24px;
 }
 
 .chord {
