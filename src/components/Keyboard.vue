@@ -96,7 +96,7 @@ export default {
       waveform: 'sine',
       playing: false,
       showFundamentals: true,
-      showInterference: false,
+      showInterference: true,
       chords: [],
       tempo: 76,
       sequencePosition: 0,
