@@ -1,4 +1,4 @@
 # Harmony (Temporary Title)
-Visualize the physics of harmony! Built with D3.js, Web Audio API, and Vue.js.
+A chord sequencer to visualize the physics of harmony! Built with D3.js, Web Audio API, and Vue.js.
 
 Site: https://focused-feynman-a696be.netlify.app/
